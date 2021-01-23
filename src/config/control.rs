@@ -17,7 +17,7 @@ pub(crate) struct Control {
 }
 
 impl Control {
-    pub fn update<'a>(
+    pub(crate) fn update<'a>(
         config: &Config,
         version: &str,
         user_defined_fields: &str,

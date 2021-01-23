@@ -16,7 +16,7 @@ struct Maintainer {
 }
 
 #[derive(Deserialize, Debug)]
-pub struct Config {
+pub(crate) struct Config {
     maintainer: Maintainer,
     package: String,
     changelog: Changelog,
@@ -26,7 +26,7 @@ pub struct Config {
 const CONFIG_FILE: &str = ".debyrc";
 
 impl Config {
-    pub fn new() -> Result<Self, Box<dyn Error>> {
+    pub(crate) fn new() -> Result<Self, Box<dyn Error>> {
         let config = Self::parse()?;
         Ok(Self {
             package: config.package,
@@ -50,7 +50,7 @@ impl Config {
         Ok(config)
     }
 
-    pub fn update(
+    pub(crate) fn update(
         &self,
         version: &str,
         changes: &str,

@@ -16,7 +16,7 @@ pub(crate) struct Changelog {
 }
 
 impl Changelog {
-    pub fn update<'a>(
+    pub(crate) fn update<'a>(
         config: &Config,
         version: &str,
         changes: &str,
