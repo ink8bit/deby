@@ -33,7 +33,7 @@ impl Control {
 
         let mut additional = String::new();
         for field in user_defined_fields.split(';') {
-            additional.push_str(&format!("X-{}\n", field));
+            additional.push_str(&format!("{}\n", field));
         }
 
         let contents = format!(
