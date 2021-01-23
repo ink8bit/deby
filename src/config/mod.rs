@@ -161,6 +161,8 @@ pub struct Config {
     control: Control,
 }
 
+const CONFIG_FILE: &str = ".debyrc";
+
 impl Config {
     pub fn new() -> Result<Self, Box<dyn Error>> {
         let config = Self::parse()?;
@@ -173,8 +175,15 @@ impl Config {
     }
 
     fn parse() -> Result<Config, Box<dyn Error>> {
-        // No config file provided case
-        let config_data = fs::read_to_string(".debyrc")?;
+        let config_data = match fs::read_to_string(CONFIG_FILE) {
+            Ok(data) => data,
+            Err(_) => {
+                panic!(
+                    "No config file provided. Create {} file in your project root.",
+                    CONFIG_FILE
+                )
+            }
+        };
         let config: Config = serde_json::from_str(&config_data)?;
         Ok(config)
     }
