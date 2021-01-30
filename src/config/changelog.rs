@@ -11,7 +11,9 @@ use super::Config;
 #[derive(Deserialize, Debug)]
 pub(crate) struct Changelog {
     update: bool,
+    #[serde(default = "Changelog::default_distribution")]
     distribution: Distribution,
+    #[serde(default = "Changelog::default_urgency")]
     urgency: Urgency,
 }
 
@@ -61,6 +63,22 @@ impl Changelog {
         file.write_all(contents.trim().as_bytes())?;
 
         Ok("Successfully created a new entry in debian/changelog file.")
+    }
+
+    pub(crate) fn default() -> Self {
+        Self {
+            update: false,
+            distribution: Distribution::Unstable,
+            urgency: Urgency::Low,
+        }
+    }
+
+    fn default_distribution() -> Distribution {
+        Distribution::Unstable
+    }
+
+    fn default_urgency() -> Urgency {
+        Urgency::Low
     }
 }
 
