@@ -19,6 +19,7 @@ struct Maintainer {
 pub(crate) struct Config {
     maintainer: Maintainer,
     package: String,
+    #[serde(default = "Changelog::default")]
     changelog: Changelog,
     #[serde(default = "Control::default")]
     control: Control,
