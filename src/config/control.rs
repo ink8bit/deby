@@ -75,6 +75,28 @@ Description: {description}
 
         Ok("Successfully created a new entry in debian/control file.")
     }
+
+    pub(crate) fn default() -> Self {
+        Self {
+            update: false,
+            source_control: SourceControl {
+                source: "no source value provided".to_string(),
+                section: "no section value provided".to_string(),
+                priority: Priority::Optional,
+                build_depends: "no build depends value provided".to_string(),
+                standards_version: "no version value provided".to_string(),
+                homepage: "no homepage value provided".to_string(),
+                vcs_browser: "no vcs browser value provided".to_string(),
+            },
+            binary_control: BinaryControl {
+                description: "no description value provided".to_string(),
+                section: "no section value provided".to_string(),
+                priority: Priority::Optional,
+                pre_depends: "no pre-depends value provided".to_string(),
+                architecture: Architecture::Any,
+            },
+        }
+    }
 }
 
 #[derive(Deserialize, Debug)]

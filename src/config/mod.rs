@@ -20,6 +20,7 @@ pub(crate) struct Config {
     maintainer: Maintainer,
     package: String,
     changelog: Changelog,
+    #[serde(default = "Control::default")]
     control: Control,
 }
 
