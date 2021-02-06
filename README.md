@@ -1,5 +1,7 @@
 # deby
 
+![Rust](https://github.com/ink8bit/deby/workflows/Rust/badge.svg)
+
 `deby` allows you to create debian changelog and control files via a config file.
 
 ## How to use
