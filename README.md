@@ -11,6 +11,8 @@
 
 Add `deby` crate to your dependencies in `Cargo.toml`:
 
+The crate is only available via git repo for now. You can include `git` key with `rev`, `tag` or `branch`. Read more in [Cargo docs](https://doc.rust-lang.org/cargo/reference/specifying-dependencies.html#specifying-dependencies-from-git-repositories).
+
 ```sh
 [dependencies]
 deby = { git = "https://github.com/ink8bit/deby", branch = "main" }
