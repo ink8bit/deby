@@ -6,13 +6,17 @@
 
 ## How to use
 
-1. create a config file `.debyrc` in your project root
+1. create a config file [.debyrc](#configuration-file) in your project root
 2. use `update` function to create (or update) debian files
 
-```rust
-// include deby crate
-use deby;
+Add `deby` crate to your dependencies in `Cargo.toml`:
 
+```sh
+[dependencies]
+deby = { git = "https://github.com/ink8bit/deby", branch = "main" }
+```
+
+```rust
 // provide required arguments
 let version = "1.0.0";
 let changes = "some changes";
