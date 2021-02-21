@@ -61,9 +61,9 @@ It should be a valid JSON file and contain the following fields:
 
 ```json
 {
-  "package": "package name",
   "changelog": {
     "update": true,
+    "package": "changelog package name",
     "distribution": "unstable",
     "urgency": "low",
     "maintainer": {
@@ -87,6 +87,7 @@ It should be a valid JSON file and contain the following fields:
       }
     },
     "binaryControl": {
+      "package": "binary package name",
       "description": "description",
       "section": "section",
       "priority": "optional",
