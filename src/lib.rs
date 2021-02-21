@@ -24,3 +24,34 @@ pub fn update(
 
     Ok((changelog_msg.to_string(), control_msg.to_string()))
 }
+
+/// Updates debian control file
+///
+/// ## Arguments
+///
+/// - `user_defined_fields` - dynamic fields to be included in binary section of control file
+pub fn update_control_file(user_defined_fields: Vec<&str>) -> Result<String, DebyError> {
+    let config = Config::new().map_err(|_| DebyError::ConfigNew)?;
+
+    let msg = config
+        .update_control(user_defined_fields)
+        .map_err(|_| DebyError::ControlUpdate)?;
+
+    Ok(msg.to_string())
+}
+
+/// Updates debian changelog file
+///
+/// ## Arguments
+///
+/// - `version` - version string to be included in changelog file
+/// - `changes` - changes to be included in changelog file
+pub fn update_changelog_file(version: &str, changes: &str) -> Result<String, DebyError> {
+    let config = Config::new().map_err(|_| DebyError::ConfigNew)?;
+
+    let msg = config
+        .update_changelog(&version, &changes)
+        .map_err(|_| DebyError::ChangelogUpdate)?;
+
+    Ok(msg.to_string())
+}

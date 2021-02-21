@@ -109,4 +109,26 @@ impl Config {
 
         Ok(msg)
     }
+
+    pub(crate) fn update_control(&self, user_defined_fields: Vec<&str>) -> Result<&str, DebyError> {
+        if !Path::new("debian").exists() {
+            fs::create_dir("debian").map_err(|_| DebyError::DebianDir)?;
+        }
+
+        let msg =
+            Control::update(&self, user_defined_fields).map_err(|_| DebyError::ControlUpdate)?;
+
+        Ok(msg)
+    }
+
+    pub(crate) fn update_changelog(&self, version: &str, changes: &str) -> Result<&str, DebyError> {
+        if !Path::new("debian").exists() {
+            fs::create_dir("debian").map_err(|_| DebyError::DebianDir)?;
+        }
+
+        let msg =
+            Changelog::update(&self, &version, &changes).map_err(|_| DebyError::ChangelogUpdate)?;
+
+        Ok(msg)
+    }
 }
