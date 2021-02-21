@@ -94,19 +94,19 @@ impl Config {
         version: &str,
         changes: &str,
         user_defined_fields: &str,
-    ) -> Result<(), DebyError> {
+    ) -> Result<(&str, &str), DebyError> {
         if !Path::new("debian").exists() {
             fs::create_dir("debian").map_err(|_| DebyError::DebianDir)?;
         }
 
         let changelog_msg =
             Changelog::update(&self, &version, &changes).map_err(|_| DebyError::ChangelogUpdate)?;
-        println!("{}", changelog_msg);
 
         let control_msg =
             Control::update(&self, &user_defined_fields).map_err(|_| DebyError::ControlUpdate)?;
-        println!("{}", control_msg);
 
-        Ok(())
+        let msg = (changelog_msg, control_msg);
+
+        Ok(msg)
     }
 }
