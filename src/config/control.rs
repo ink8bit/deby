@@ -62,7 +62,7 @@ Description: {description}
             standards_version = config.control.source_control.standards_version,
             homepage = config.control.source_control.homepage,
             vcs_browser = config.control.source_control.vcs_browser,
-            package = config.package,
+            package = config.control.binary_control.package,
             section = config.control.binary_control.section,
             binary_priority = config.control.binary_control.priority,
             pre_depends = config.control.binary_control.pre_depends,
@@ -93,6 +93,7 @@ Description: {description}
                 vcs_browser: "no vcs browser value provided".to_string(),
             },
             binary_control: BinaryControl {
+                package: "no package name provided".to_string(),
                 description: "no description value provided".to_string(),
                 section: "no section value provided".to_string(),
                 priority: Priority::Optional,
@@ -148,6 +149,7 @@ impl Display for Priority {
 
 #[derive(Deserialize, Debug)]
 struct BinaryControl {
+    package: String,
     description: String,
     section: String,
     priority: Priority,
