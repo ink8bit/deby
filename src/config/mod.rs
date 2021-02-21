@@ -63,7 +63,7 @@ impl Config {
             Err(e) => panic!("{}", e),
         };
 
-        match Control::update(&self, &version, &user_defined_fields) {
+        match Control::update(&self, &user_defined_fields) {
             Ok(msg) => println!("{}", msg),
             Err(e) => panic!("{}", e),
         };

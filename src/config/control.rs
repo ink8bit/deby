@@ -19,7 +19,6 @@ pub(crate) struct Control {
 impl Control {
     pub(crate) fn update<'a>(
         config: &Config,
-        version: &str,
         user_defined_fields: &str,
     ) -> Result<&'a str, Box<dyn Error>> {
         if !config.control.update {
@@ -39,6 +38,7 @@ impl Control {
         let contents = format!(
             "
 Source: {source}
+Section: {source_section}
 Priority: {source_priority}
 Maintainer: {name} <{email}>
 Build-Depends: {build_depends}
@@ -47,7 +47,7 @@ Homepage: {homepage}
 Vcs-Browser: {vcs_browser}
 
 Package: {package}
-Section: {section}
+Section: {binary_section}
 Priority: {binary_priority}
 Pre-Depends: {pre_depends}
 Architecture: {arch}
@@ -55,6 +55,7 @@ Description: {description}
 {additional}
 ",
             source = config.control.source_control.source,
+            source_section = config.control.source_control.section,
             source_priority = config.control.source_control.priority,
             name = config.control.source_control.maintainer.name,
             email = config.control.source_control.maintainer.email,
@@ -63,7 +64,7 @@ Description: {description}
             homepage = config.control.source_control.homepage,
             vcs_browser = config.control.source_control.vcs_browser,
             package = config.control.binary_control.package,
-            section = config.control.binary_control.section,
+            binary_section = config.control.binary_control.section,
             binary_priority = config.control.binary_control.priority,
             pre_depends = config.control.binary_control.pre_depends,
             arch = config.control.binary_control.architecture,
