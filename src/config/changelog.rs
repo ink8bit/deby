@@ -11,6 +11,7 @@ use super::{Config, Maintainer};
 #[derive(Deserialize, Debug)]
 pub(crate) struct Changelog {
     update: bool,
+    package: String,
     #[serde(default = "Changelog::default_distribution")]
     distribution: Distribution,
     #[serde(default = "Changelog::default_urgency")]
@@ -50,7 +51,7 @@ impl Changelog {
 -- {name} <{email}>  {date}
 
 {current}",
-            package = config.package,
+            package = config.changelog.package,
             email = config.changelog.maintainer.email,
             name = config.changelog.maintainer.name,
             distribution = config.changelog.distribution,
@@ -69,6 +70,7 @@ impl Changelog {
     pub(crate) fn default() -> Self {
         Self {
             update: false,
+            package: "no package name provided".to_string(),
             distribution: Distribution::Unstable,
             urgency: Urgency::Low,
             maintainer: Maintainer {

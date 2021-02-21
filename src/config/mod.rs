@@ -17,7 +17,6 @@ struct Maintainer {
 
 #[derive(Deserialize, Debug)]
 pub(crate) struct Config {
-    package: String,
     #[serde(default = "Changelog::default")]
     changelog: Changelog,
     #[serde(default = "Control::default")]
@@ -30,7 +29,6 @@ impl Config {
     pub(crate) fn new() -> Result<Self, Box<dyn Error>> {
         let config = Self::parse()?;
         Ok(Self {
-            package: config.package,
             changelog: config.changelog,
             control: config.control,
         })
