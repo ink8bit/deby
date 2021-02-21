@@ -13,13 +13,6 @@ pub fn update(
         Err(e) => panic!("{}", e),
     };
     config.update(version, changes, user_defined_fields)?;
-    Ok(())
-}
 
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn it_works() {
-        todo!();
-    }
+    Ok(())
 }
