@@ -1,7 +1,6 @@
 mod config;
 
-use config::Config;
-use std::error::Error;
+use config::{Config, DebyError};
 
 /// Updates `changelog` and `control` files
 ///
@@ -10,17 +9,12 @@ use std::error::Error;
 /// - `version` - an updated version string
 /// - `changes` - changes to be included in your files
 /// - `user_defined_fields` - additional dynamic fields to be included in `control` file
-pub fn update(
-    version: &str,
-    changes: &str,
-    user_defined_fields: &str,
-) -> Result<(), Box<dyn Error>> {
-    let config = match Config::new() {
-        Ok(c) => c,
-        Err(e) => panic!("{}", e),
-    };
+pub fn update(version: &str, changes: &str, user_defined_fields: &str) -> Result<(), DebyError> {
+    let config = Config::new().map_err(|_| DebyError::ConfigNew)?;
 
-    config.update(version, changes, user_defined_fields)?;
+    config
+        .update(version, changes, user_defined_fields)
+        .map_err(|_| DebyError::Update)?;
 
     Ok(())
 }

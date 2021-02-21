@@ -1,11 +1,10 @@
 use serde::Deserialize;
 
-use std::error::Error;
 use std::fmt::Display;
 use std::fs::OpenOptions;
 use std::io::Write;
 
-use super::{Config, Maintainer};
+use super::{Config, DebyError, Maintainer};
 
 #[derive(Deserialize, Debug)]
 pub(crate) struct Control {
@@ -20,7 +19,7 @@ impl Control {
     pub(crate) fn update<'a>(
         config: &Config,
         user_defined_fields: &str,
-    ) -> Result<&'a str, Box<dyn Error>> {
+    ) -> Result<&'a str, DebyError> {
         if !config.control.update {
             return Ok("debian/control file not updated due to config file setting.");
         }
@@ -28,7 +27,8 @@ impl Control {
         let mut file = OpenOptions::new()
             .create(true)
             .write(true)
-            .open("debian/control")?;
+            .open("debian/control")
+            .map_err(|_| DebyError::ControlOpen)?;
 
         let mut additional = String::new();
         for field in user_defined_fields.split(';') {
@@ -72,7 +72,8 @@ Description: {description}
             additional = additional,
         );
 
-        file.write_all(contents.trim().as_bytes())?;
+        file.write_all(contents.trim().as_bytes())
+            .map_err(|_| DebyError::ControlWrite)?;
 
         Ok("Successfully created a new entry in debian/control file.")
     }
@@ -81,24 +82,24 @@ Description: {description}
         Self {
             update: false,
             source_control: SourceControl {
-                source: "no source value provided".to_string(),
+                source: "".to_string(),
                 maintainer: Maintainer {
-                    name: "no maintainer name provided".to_string(),
-                    email: "no maintainer email provided".to_string(),
+                    name: "".to_string(),
+                    email: "".to_string(),
                 },
-                section: "no section value provided".to_string(),
+                section: "".to_string(),
                 priority: Priority::Optional,
-                build_depends: "no build depends value provided".to_string(),
-                standards_version: "no version value provided".to_string(),
-                homepage: "no homepage value provided".to_string(),
-                vcs_browser: "no vcs browser value provided".to_string(),
+                build_depends: "".to_string(),
+                standards_version: "".to_string(),
+                homepage: "".to_string(),
+                vcs_browser: "".to_string(),
             },
             binary_control: BinaryControl {
-                package: "no package name provided".to_string(),
-                description: "no description value provided".to_string(),
-                section: "no section value provided".to_string(),
+                package: "".to_string(),
+                description: "".to_string(),
+                section: "".to_string(),
                 priority: Priority::Optional,
-                pre_depends: "no pre-depends value provided".to_string(),
+                pre_depends: "".to_string(),
                 architecture: Architecture::Any,
             },
         }
