@@ -93,7 +93,7 @@ impl Config {
         &self,
         version: &str,
         changes: &str,
-        user_defined_fields: &str,
+        user_defined_fields: Vec<&str>,
     ) -> Result<(&str, &str), DebyError> {
         if !Path::new("debian").exists() {
             fs::create_dir("debian").map_err(|_| DebyError::DebianDir)?;
@@ -103,7 +103,7 @@ impl Config {
             Changelog::update(&self, &version, &changes).map_err(|_| DebyError::ChangelogUpdate)?;
 
         let control_msg =
-            Control::update(&self, &user_defined_fields).map_err(|_| DebyError::ControlUpdate)?;
+            Control::update(&self, user_defined_fields).map_err(|_| DebyError::ControlUpdate)?;
 
         let msg = (changelog_msg, control_msg);
 
