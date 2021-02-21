@@ -1,6 +1,6 @@
 [package]
 name = "deby"
-version = "0.0.1"
+version = "0.0.2"
 authors = ["ink8bit <ink8bit@users.noreply.github.com>"]
 edition = "2018"
 
