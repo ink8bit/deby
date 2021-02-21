@@ -18,7 +18,7 @@ pub(crate) struct Control {
 impl Control {
     pub(crate) fn update<'a>(
         config: &Config,
-        user_defined_fields: &str,
+        user_defined_fields: Vec<&str>,
     ) -> Result<&'a str, DebyError> {
         if !config.control.update {
             return Ok("debian/control file not updated due to config file setting.");
@@ -31,7 +31,7 @@ impl Control {
             .map_err(|_| DebyError::ControlOpen)?;
 
         let mut additional = String::new();
-        for field in user_defined_fields.split(';') {
+        for field in user_defined_fields {
             additional.push_str(&format!("{}\n", field));
         }
 

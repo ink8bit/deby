@@ -12,7 +12,7 @@ use config::{Config, DebyError};
 pub fn update(
     version: &str,
     changes: &str,
-    user_defined_fields: &str,
+    user_defined_fields: Vec<&str>,
 ) -> Result<(String, String), DebyError> {
     let config = Config::new().map_err(|_| DebyError::ConfigNew)?;
 
