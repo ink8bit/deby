@@ -17,7 +17,6 @@ struct Maintainer {
 
 #[derive(Deserialize, Debug)]
 pub(crate) struct Config {
-    maintainer: Maintainer,
     package: String,
     #[serde(default = "Changelog::default")]
     changelog: Changelog,
@@ -32,7 +31,6 @@ impl Config {
         let config = Self::parse()?;
         Ok(Self {
             package: config.package,
-            maintainer: config.maintainer,
             changelog: config.changelog,
             control: config.control,
         })

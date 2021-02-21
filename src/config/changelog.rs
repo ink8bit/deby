@@ -6,7 +6,7 @@ use std::fs::OpenOptions;
 use std::io::Write;
 use std::{error::Error, fs};
 
-use super::Config;
+use super::{Config, Maintainer};
 
 #[derive(Deserialize, Debug)]
 pub(crate) struct Changelog {
@@ -15,6 +15,7 @@ pub(crate) struct Changelog {
     distribution: Distribution,
     #[serde(default = "Changelog::default_urgency")]
     urgency: Urgency,
+    maintainer: Maintainer,
 }
 
 impl Changelog {
@@ -50,8 +51,8 @@ impl Changelog {
 
 {current}",
             package = config.package,
-            email = config.maintainer.email,
-            name = config.maintainer.name,
+            email = config.changelog.maintainer.email,
+            name = config.changelog.maintainer.name,
             distribution = config.changelog.distribution,
             urgency = config.changelog.urgency,
             current = current,
@@ -70,6 +71,10 @@ impl Changelog {
             update: false,
             distribution: Distribution::Unstable,
             urgency: Urgency::Low,
+            maintainer: Maintainer {
+                name: "no maintainer name provided".to_string(),
+                email: "no maintainer email provided".to_string(),
+            },
         }
     }
 

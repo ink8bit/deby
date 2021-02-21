@@ -5,7 +5,7 @@ use std::fmt::Display;
 use std::fs::OpenOptions;
 use std::io::Write;
 
-use super::Config;
+use super::{Config, Maintainer};
 
 #[derive(Deserialize, Debug)]
 pub(crate) struct Control {
@@ -56,8 +56,8 @@ Description: {description}
 ",
             source = config.control.source_control.source,
             source_priority = config.control.source_control.priority,
-            name = config.maintainer.name,
-            email = config.maintainer.email,
+            name = config.control.source_control.maintainer.name,
+            email = config.control.source_control.maintainer.email,
             build_depends = config.control.source_control.build_depends,
             standards_version = config.control.source_control.standards_version,
             homepage = config.control.source_control.homepage,
@@ -81,6 +81,10 @@ Description: {description}
             update: false,
             source_control: SourceControl {
                 source: "no source value provided".to_string(),
+                maintainer: Maintainer {
+                    name: "no maintainer name provided".to_string(),
+                    email: "no maintainer email provided".to_string(),
+                },
                 section: "no section value provided".to_string(),
                 priority: Priority::Optional,
                 build_depends: "no build depends value provided".to_string(),
@@ -155,6 +159,7 @@ struct BinaryControl {
 #[derive(Deserialize, Debug)]
 struct SourceControl {
     source: String,
+    maintainer: Maintainer,
     section: String,
     priority: Priority,
     #[serde(rename(deserialize = "buildDepends"))]
