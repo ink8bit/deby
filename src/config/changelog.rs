@@ -33,7 +33,7 @@ impl Changelog {
             .create(true)
             .write(true)
             .open("debian/changelog")?;
-        let current = fs::read_to_string("debian/changelog")?;
+        let current_file = fs::read_to_string("debian/changelog")?;
 
         let dt = Utc::now().to_rfc2822();
 
@@ -56,7 +56,7 @@ impl Changelog {
             name = config.changelog.maintainer.name,
             distribution = config.changelog.distribution,
             urgency = config.changelog.urgency,
-            current = current,
+            current = current_file,
             date = dt,
             version = version,
             changes = changes_list.trim(),
