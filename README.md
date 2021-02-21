@@ -22,11 +22,34 @@ deby = { git = "https://github.com/ink8bit/deby", branch = "main" }
 // provide required arguments
 let version = "1.0.0";
 let changes = "some changes";
-// if you want to provide additional fields - separate them with `;` or just put an empty string
-let additional_fields = "Some-Field: A;Another-Field: B";
 
-if let Err(e) = deby::update(version, changes, additional_fields) {
-    panic!("{}", e);
+// if you want to provide additional fields - separate them with `;` or just put an empty string
+let user_defined_fields: Vec<&str> = vec!["Some-Field: A", "Another-Field: B"];
+
+match deby::update(version, changes, user_defined_fields) {
+    Ok(msg) => {
+        println!("{}", msg.0);
+        println!("{}", msg.1);
+    }
+    Err(e) => panic!("{}", e),
+}
+```
+
+If you want to update *control* and *changelog* files separately, you should use two public functions:
+
+```rust
+let version = "1.0.0";
+let changes = "changes:\nline1\nline2\nline3";
+let user_defined_fields: Vec<&str> = vec!["Some-Field: A", "Another-Field: B"];
+
+match deby::update_changelog_file(version, changes) {
+    Ok(msg) => println!("{}", msg),
+    Err(e) => panic!("{}", e),
+}
+
+match deby::update_control_file(user_defined_fields) {
+    Ok(msg) => println!("{}", msg),
+    Err(e) => panic!("{}", e),
 }
 ```
 
@@ -39,14 +62,14 @@ It should be a valid JSON file and contain the following fields:
 ```json
 {
   "package": "package name",
-  "maintainer": {
-    "email": "user@example.com",
-    "name": "username"
-  },
   "changelog": {
     "update": true,
     "distribution": "unstable",
-    "urgency": "low"
+    "urgency": "low",
+    "maintainer": {
+      "name": "maintainer name",
+      "email": "maintainer email"
+    }
   },
   "control": {
     "update": true,
@@ -57,7 +80,11 @@ It should be a valid JSON file and contain the following fields:
       "buildDepends": "depends",
       "standardsVersion": "1.2.3",
       "homepage": "url",
-      "vcsBrowser": "url"
+      "vcsBrowser": "url",
+      "maintainer": {
+        "name": "maintainer name",
+        "email": "maintainer email"
+      }
     },
     "binaryControl": {
       "description": "description",
