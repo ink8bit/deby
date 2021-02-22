@@ -182,4 +182,60 @@ mod tests {
         assert_eq!(default.maintainer.name, empty_str);
         assert_eq!(default.maintainer.email, empty_str);
     }
+
+    #[test]
+    fn test_format_contents() {
+        let fake_entry = "entry";
+        let fake_current_file = "current file contents";
+        let actual = Changelog::format_contents(fake_entry, fake_current_file);
+
+        let expected = format!(
+            "
+{entry}
+
+{current}
+",
+            entry = fake_entry,
+            current = fake_current_file
+        )
+        .trim()
+        .to_string();
+
+        assert_eq!(actual, expected);
+    }
+
+    #[test]
+    fn test_format_contents_whitespace_new_line() {
+        let fake_entry = "\nentry     \n\n";
+        let fake_current_file = "\ncurrent file contents     \n";
+        let actual = Changelog::format_contents(fake_entry, fake_current_file);
+
+        let expected = format!(
+            "
+{entry}
+
+{current}",
+            entry = fake_entry,
+            current = fake_current_file
+        )
+        .trim()
+        .to_string();
+
+        assert_eq!(actual, expected);
+    }
+
+    #[test]
+    fn test_format_changes() {
+        let fake_changes = "change1\nchange2\nchange3\n";
+
+        let actual = Changelog::format_changes(fake_changes);
+        let expected = "* change1
+* change2
+* change3
+"
+        .trim()
+        .to_string();
+
+        assert_eq!(actual, expected);
+    }
 }
