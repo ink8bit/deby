@@ -21,6 +21,59 @@ pub(crate) struct Changelog {
 }
 
 impl Changelog {
+    fn format_contents(entry: &str, current_file_contents: &str) -> String {
+        let contents = format!(
+            "
+{entry}
+
+{current}
+",
+            entry = entry,
+            current = current_file_contents
+        );
+
+        contents.trim().to_string()
+    }
+
+    fn format_changelog_entry(config: &Config, version: &str, changes: &str) -> String {
+        let date = Changelog::format_date();
+
+        let contents = format!(
+            "
+{package} ({version}) {distribution}; urgency={urgency}
+
+{changes}
+
+-- {name} <{email}>  {date}",
+            package = config.changelog.package,
+            email = config.changelog.maintainer.email,
+            name = config.changelog.maintainer.name,
+            distribution = config.changelog.distribution,
+            urgency = config.changelog.urgency,
+            date = date,
+            version = version,
+            changes = changes,
+        );
+
+        contents
+    }
+
+    fn format_changes(changes: &str) -> String {
+        if changes.is_empty() {
+            return "".to_string();
+        }
+        let mut formatted_changes = String::new();
+        for line in changes.lines() {
+            formatted_changes.push_str(&format!("* {}\n", line));
+        }
+
+        formatted_changes.trim().to_string()
+    }
+
+    fn format_date() -> String {
+        Utc::now().to_rfc2822()
+    }
+
     pub(crate) fn update<'a>(
         config: &Config,
         version: &str,
@@ -37,34 +90,12 @@ impl Changelog {
 
         let current_file = fs::read_to_string("debian/changelog")?;
 
-        let dt = Utc::now().to_rfc2822();
+        let formatted_changes = Changelog::format_changes(changes);
+        let changelog_entry =
+            Changelog::format_changelog_entry(&config, &version, &formatted_changes);
+        let contents = Changelog::format_contents(&changelog_entry, &current_file);
 
-        let mut changes_list = String::new();
-        for line in changes.lines() {
-            changes_list.push_str(&format!("* {}\n", line));
-        }
-
-        let contents = format!(
-            "
-{package} ({version}) {distribution}; urgency={urgency}
-
-{changes}
-
--- {name} <{email}>  {date}
-
-{current}",
-            package = config.changelog.package,
-            email = config.changelog.maintainer.email,
-            name = config.changelog.maintainer.name,
-            distribution = config.changelog.distribution,
-            urgency = config.changelog.urgency,
-            current = current_file,
-            date = dt,
-            version = version,
-            changes = changes_list.trim(),
-        );
-
-        file.write_all(contents.trim().as_bytes())?;
+        file.write_all(contents.as_bytes())?;
 
         Ok("Successfully created a new entry in debian/changelog file.")
     }
