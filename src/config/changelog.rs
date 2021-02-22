@@ -72,7 +72,7 @@ impl Changelog {
     pub(crate) fn default() -> Self {
         Self {
             update: false,
-            package: "no package name provided".to_string(),
+            package: "".to_string(),
             distribution: Distribution::Unstable,
             urgency: Urgency::Low,
             maintainer: Maintainer {
@@ -91,7 +91,7 @@ impl Changelog {
     }
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, PartialEq)]
 enum Urgency {
     #[serde(rename(deserialize = "low"))]
     Low,
@@ -117,7 +117,7 @@ impl Display for Urgency {
     }
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, PartialEq)]
 enum Distribution {
     #[serde(rename(deserialize = "unstable"))]
     Unstable,
@@ -131,5 +131,24 @@ impl Display for Distribution {
             Distribution::Unstable => write!(f, "unstable"),
             Distribution::Experimental => write!(f, "experimental"),
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_default() {
+        let default = Changelog::default();
+        let empty_str = String::new();
+
+        assert_eq!(default.update, false);
+
+        assert_eq!(default.package, empty_str);
+        assert_eq!(default.distribution, Distribution::Unstable);
+        assert_eq!(default.urgency, Urgency::Low);
+        assert_eq!(default.maintainer.name, empty_str);
+        assert_eq!(default.maintainer.email, empty_str);
     }
 }
