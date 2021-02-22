@@ -17,6 +17,97 @@ pub(crate) struct Control {
 }
 
 impl Control {
+    fn create_contents(config: &Config, user_defined_fields: Vec<&str>) -> String {
+        let mut additional = String::new();
+        for field in user_defined_fields {
+            additional.push_str(&format!("{}\n", field));
+        }
+
+        let mut source_data = String::new();
+        let mut binary_data = String::new();
+
+        let source = &config.control.source_control.source;
+        if !source.is_empty() {
+            let f = format!("Source: {}\n", source);
+            source_data.push_str(&f);
+        }
+
+        let section = &config.control.source_control.section;
+        if !section.is_empty() {
+            let f = format!("Section: {}\n", section);
+            source_data.push_str(&f);
+        }
+
+        let priority = &config.control.source_control.priority;
+        source_data.push_str(&format!("Priority: {}\n", priority));
+
+        let name = &config.control.source_control.maintainer.name;
+        let email = &config.control.source_control.maintainer.email;
+        source_data.push_str(&format!("Maintainer: {n} <{e}>\n", n = name, e = email));
+
+        let build_depends = &config.control.source_control.build_depends;
+        if !build_depends.is_empty() {
+            let f = format!("Build-Depends: {}\n", build_depends);
+            source_data.push_str(&f);
+        }
+
+        let standards_version = &config.control.source_control.standards_version;
+        if !standards_version.is_empty() {
+            let f = format!("Standards-Version: {}\n", standards_version);
+            source_data.push_str(&f);
+        }
+
+        let homepage = &config.control.source_control.homepage;
+        if !homepage.is_empty() {
+            let f = format!("Homepage: {}\n", homepage);
+            source_data.push_str(&f);
+        }
+
+        let vcs_browser = &config.control.source_control.vcs_browser;
+        if !vcs_browser.is_empty() {
+            let f = format!("Vcs-Browser: {}\n", vcs_browser);
+            source_data.push_str(&f);
+        }
+
+        let binary_package = &config.control.binary_control.package;
+        if !binary_package.is_empty() {
+            let f = format!("Package: {}\n", binary_package);
+            binary_data.push_str(&f);
+        }
+
+        let binary_section = &config.control.binary_control.section;
+        if !binary_section.is_empty() {
+            let f = format!("Section: {}\n", binary_section);
+            binary_data.push_str(&f);
+        }
+
+        let binary_priority = &config.control.binary_control.priority;
+        binary_data.push_str(&format!("Priority: {}\n", binary_priority));
+
+        let pre_depends = &config.control.binary_control.pre_depends;
+        binary_data.push_str(&format!("Pre-Depends: {}\n", pre_depends));
+
+        let arch = &config.control.binary_control.architecture;
+        binary_data.push_str(&format!("Architecture: {}\n", arch));
+
+        let description = &config.control.binary_control.description;
+        binary_data.push_str(&format!("Description: {}\n", description));
+
+        let contents = format!(
+            "
+{source_data}
+
+{binary_data}
+{additional}
+",
+            source_data = source_data.trim(),
+            binary_data = binary_data.trim(),
+            additional = additional.trim(),
+        );
+
+        contents.trim().to_string()
+    }
+
     pub(crate) fn update<'a>(
         config: &Config,
         user_defined_fields: Vec<&str>,
@@ -30,49 +121,9 @@ impl Control {
             .write(true)
             .open("debian/control")?;
 
-        let mut additional = String::new();
-        for field in user_defined_fields {
-            additional.push_str(&format!("{}\n", field));
-        }
+        let contents = Control::create_contents(config, user_defined_fields);
 
-        let contents = format!(
-            "
-Source: {source}
-Section: {source_section}
-Priority: {source_priority}
-Maintainer: {name} <{email}>
-Build-Depends: {build_depends}
-Standards-Version: {standards_version}
-Homepage: {homepage}
-Vcs-Browser: {vcs_browser}
-
-Package: {package}
-Section: {binary_section}
-Priority: {binary_priority}
-Pre-Depends: {pre_depends}
-Architecture: {arch}
-Description: {description}
-{additional}
-",
-            source = config.control.source_control.source,
-            source_section = config.control.source_control.section,
-            source_priority = config.control.source_control.priority,
-            name = config.control.source_control.maintainer.name,
-            email = config.control.source_control.maintainer.email,
-            build_depends = config.control.source_control.build_depends,
-            standards_version = config.control.source_control.standards_version,
-            homepage = config.control.source_control.homepage,
-            vcs_browser = config.control.source_control.vcs_browser,
-            package = config.control.binary_control.package,
-            binary_section = config.control.binary_control.section,
-            binary_priority = config.control.binary_control.priority,
-            pre_depends = config.control.binary_control.pre_depends,
-            arch = config.control.binary_control.architecture,
-            description = config.control.binary_control.description,
-            additional = additional,
-        );
-
-        file.write_all(contents.trim().as_bytes())?;
+        file.write_all(contents.as_bytes())?;
 
         Ok("Successfully created a new entry in debian/control file.")
     }
@@ -102,6 +153,10 @@ Description: {description}
                 architecture: Architecture::Any,
             },
         }
+    }
+
+    fn default_string_value() -> String {
+        "".to_string()
     }
 }
 
@@ -150,26 +205,44 @@ impl Display for Priority {
 
 #[derive(Deserialize, Debug)]
 struct BinaryControl {
+    #[serde(default = "Control::default_string_value")]
     package: String,
+    #[serde(default = "Control::default_string_value")]
     description: String,
+    #[serde(default = "Control::default_string_value")]
     section: String,
     priority: Priority,
-    #[serde(rename(deserialize = "preDepends"))]
+    #[serde(
+        rename(deserialize = "preDepends"),
+        default = "Control::default_string_value"
+    )]
     pre_depends: String,
     architecture: Architecture,
 }
 
 #[derive(Deserialize, Debug)]
 struct SourceControl {
+    #[serde(default = "Control::default_string_value")]
     source: String,
     maintainer: Maintainer,
+    #[serde(default = "Control::default_string_value")]
     section: String,
     priority: Priority,
-    #[serde(rename(deserialize = "buildDepends"))]
+    #[serde(
+        rename(deserialize = "buildDepends"),
+        default = "Control::default_string_value"
+    )]
     build_depends: String,
-    #[serde(rename(deserialize = "standardsVersion"))]
+    #[serde(
+        rename(deserialize = "standardsVersion"),
+        default = "Control::default_string_value"
+    )]
     standards_version: String,
+    #[serde(default = "Control::default_string_value")]
     homepage: String,
-    #[serde(rename(deserialize = "vcsBrowser"))]
+    #[serde(
+        rename(deserialize = "vcsBrowser"),
+        default = "Control::default_string_value"
+    )]
     vcs_browser: String,
 }
