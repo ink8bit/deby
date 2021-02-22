@@ -1,6 +1,6 @@
 use serde::Deserialize;
 
-use std::fmt;
+use std::error::Error;
 use std::fs;
 use std::path::Path;
 
@@ -9,51 +9,6 @@ mod control;
 
 use changelog::Changelog;
 use control::Control;
-
-#[derive(Debug)]
-pub enum DebyError {
-    ConfigParse,
-    ConfigNew,
-    Update,
-    ConfigRead,
-    Deserialize,
-    DebianDir,
-    ChangelogUpdate,
-    ChangelogOpen,
-    ChangelogRead,
-    ChangelogWrite,
-    ControlUpdate,
-    ControlOpen,
-    ControlWrite,
-}
-
-impl fmt::Display for DebyError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match self {
-            DebyError::ConfigNew => {
-                write!(f, "Could not create configuration from config file .debyrc")
-            }
-            DebyError::ConfigParse => write!(f, "Could not parse config file .debyrc"),
-            DebyError::ConfigRead => write!(f, "No config file .debyrc found"),
-
-            DebyError::Update => write!(f, "Could not update your files"),
-            DebyError::Deserialize => write!(f, "Could not deserialize .debyrc config file"),
-            DebyError::DebianDir => write!(
-                f,
-                "No directory with `debian` name found in the root of the project"
-            ),
-
-            DebyError::ChangelogUpdate => write!(f, "Could not update debian changelog file"),
-            DebyError::ChangelogOpen => write!(f, "Could not open debian changelog file"),
-            DebyError::ChangelogRead => write!(f, "Could not read debian changelog file"),
-            DebyError::ChangelogWrite => write!(f, "Could not update debian changelog file"),
-
-            DebyError::ControlUpdate => write!(f, "Could not update debian control file"),
-            DebyError::ControlOpen => write!(f, "Could not open debian control file"),
-            DebyError::ControlWrite => write!(f, "Could not update debian control file"),
-        }
-    }
-}
 
 #[derive(Deserialize, Debug)]
 struct Maintainer {
@@ -72,8 +27,8 @@ pub(crate) struct Config {
 const CONFIG_FILE: &str = ".debyrc";
 
 impl Config {
-    pub(crate) fn new() -> Result<Self, DebyError> {
-        let config = Self::parse().map_err(|_| DebyError::ConfigParse)?;
+    pub(crate) fn new() -> Result<Self, std::io::Error> {
+        let config = Self::parse()?;
 
         Ok(Self {
             changelog: config.changelog,
@@ -81,10 +36,9 @@ impl Config {
         })
     }
 
-    fn parse() -> Result<Config, DebyError> {
-        let config_data = fs::read_to_string(CONFIG_FILE).map_err(|_| DebyError::ConfigRead)?;
-        let config: Config =
-            serde_json::from_str(&config_data).map_err(|_| DebyError::Deserialize)?;
+    fn parse() -> Result<Config, std::io::Error> {
+        let config_data = fs::read_to_string(CONFIG_FILE)?;
+        let config: Config = serde_json::from_str(&config_data)?;
 
         Ok(config)
     }
@@ -94,40 +48,41 @@ impl Config {
         version: &str,
         changes: &str,
         user_defined_fields: Vec<&str>,
-    ) -> Result<(&str, &str), DebyError> {
+    ) -> Result<(&str, &str), Box<dyn Error>> {
         if !Path::new("debian").exists() {
-            fs::create_dir("debian").map_err(|_| DebyError::DebianDir)?;
+            fs::create_dir("debian")?;
         }
 
-        let changelog_msg =
-            Changelog::update(&self, &version, &changes).map_err(|_| DebyError::ChangelogUpdate)?;
-
-        let control_msg =
-            Control::update(&self, user_defined_fields).map_err(|_| DebyError::ControlUpdate)?;
-
+        let changelog_msg = Changelog::update(&self, &version, &changes)?;
+        let control_msg = Control::update(&self, user_defined_fields)?;
         let msg = (changelog_msg, control_msg);
 
         Ok(msg)
     }
 
-    pub(crate) fn update_control(&self, user_defined_fields: Vec<&str>) -> Result<&str, DebyError> {
+    pub(crate) fn update_control(
+        &self,
+        user_defined_fields: Vec<&str>,
+    ) -> Result<&str, Box<dyn Error>> {
         if !Path::new("debian").exists() {
-            fs::create_dir("debian").map_err(|_| DebyError::DebianDir)?;
+            fs::create_dir("debian")?;
         }
 
-        let msg =
-            Control::update(&self, user_defined_fields).map_err(|_| DebyError::ControlUpdate)?;
+        let msg = Control::update(&self, user_defined_fields)?;
 
         Ok(msg)
     }
 
-    pub(crate) fn update_changelog(&self, version: &str, changes: &str) -> Result<&str, DebyError> {
+    pub(crate) fn update_changelog(
+        &self,
+        version: &str,
+        changes: &str,
+    ) -> Result<&str, Box<dyn Error>> {
         if !Path::new("debian").exists() {
-            fs::create_dir("debian").map_err(|_| DebyError::DebianDir)?;
+            fs::create_dir("debian")?;
         }
 
-        let msg =
-            Changelog::update(&self, &version, &changes).map_err(|_| DebyError::ChangelogUpdate)?;
+        let msg = Changelog::update(&self, &version, &changes)?;
 
         Ok(msg)
     }
