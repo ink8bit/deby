@@ -1,10 +1,11 @@
 use serde::Deserialize;
 
+use std::error::Error;
 use std::fmt::Display;
 use std::fs::OpenOptions;
 use std::io::Write;
 
-use super::{Config, DebyError, Maintainer};
+use super::{Config, Maintainer};
 
 #[derive(Deserialize, Debug)]
 pub(crate) struct Control {
@@ -19,7 +20,7 @@ impl Control {
     pub(crate) fn update<'a>(
         config: &Config,
         user_defined_fields: Vec<&str>,
-    ) -> Result<&'a str, DebyError> {
+    ) -> Result<&'a str, Box<dyn Error>> {
         if !config.control.update {
             return Ok("debian/control file not updated due to config file setting.");
         }
@@ -27,8 +28,7 @@ impl Control {
         let mut file = OpenOptions::new()
             .create(true)
             .write(true)
-            .open("debian/control")
-            .map_err(|_| DebyError::ControlOpen)?;
+            .open("debian/control")?;
 
         let mut additional = String::new();
         for field in user_defined_fields {
@@ -72,8 +72,7 @@ Description: {description}
             additional = additional,
         );
 
-        file.write_all(contents.trim().as_bytes())
-            .map_err(|_| DebyError::ControlWrite)?;
+        file.write_all(contents.trim().as_bytes())?;
 
         Ok("Successfully created a new entry in debian/control file.")
     }

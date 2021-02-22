@@ -1,12 +1,13 @@
 use chrono::prelude::*;
 use serde::Deserialize;
 
+use std::error::Error;
 use std::fmt::Display;
 use std::fs;
 use std::fs::OpenOptions;
 use std::io::Write;
 
-use super::{Config, DebyError, Maintainer};
+use super::{Config, Maintainer};
 
 #[derive(Deserialize, Debug)]
 pub(crate) struct Changelog {
@@ -24,7 +25,7 @@ impl Changelog {
         config: &Config,
         version: &str,
         changes: &str,
-    ) -> Result<&'a str, DebyError> {
+    ) -> Result<&'a str, Box<dyn Error>> {
         if !config.changelog.update {
             return Ok("debian/changelog file not updated due to config file setting.");
         }
@@ -32,11 +33,9 @@ impl Changelog {
         let mut file = OpenOptions::new()
             .create(true)
             .write(true)
-            .open("debian/changelog")
-            .map_err(|_| DebyError::ChangelogOpen)?;
+            .open("debian/changelog")?;
 
-        let current_file =
-            fs::read_to_string("debian/changelog").map_err(|_| DebyError::ChangelogRead)?;
+        let current_file = fs::read_to_string("debian/changelog")?;
 
         let dt = Utc::now().to_rfc2822();
 
@@ -65,8 +64,7 @@ impl Changelog {
             changes = changes_list.trim(),
         );
 
-        file.write_all(contents.trim().as_bytes())
-            .map_err(|_| DebyError::ChangelogWrite)?;
+        file.write_all(contents.trim().as_bytes())?;
 
         Ok("Successfully created a new entry in debian/changelog file.")
     }
