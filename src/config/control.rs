@@ -160,7 +160,7 @@ impl Control {
     }
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, PartialEq)]
 enum Architecture {
     #[serde(rename(deserialize = "all"))]
     All,
@@ -177,7 +177,7 @@ impl Display for Architecture {
     }
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, PartialEq)]
 enum Priority {
     #[serde(rename(deserialize = "required"))]
     Required,
@@ -245,4 +245,34 @@ struct SourceControl {
         default = "Control::default_string_value"
     )]
     vcs_browser: String,
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_default() {
+        let default = Control::default();
+        let empty_str = String::new();
+
+        assert_eq!(default.update, false);
+
+        assert_eq!(default.source_control.source, empty_str);
+        assert_eq!(default.source_control.maintainer.name, empty_str);
+        assert_eq!(default.source_control.maintainer.email, empty_str);
+        assert_eq!(default.source_control.section, empty_str);
+        assert_eq!(default.source_control.priority, Priority::Optional);
+        assert_eq!(default.source_control.build_depends, empty_str);
+        assert_eq!(default.source_control.standards_version, empty_str);
+        assert_eq!(default.source_control.homepage, empty_str);
+        assert_eq!(default.source_control.vcs_browser, empty_str);
+
+        assert_eq!(default.binary_control.package, empty_str);
+        assert_eq!(default.binary_control.description, empty_str);
+        assert_eq!(default.binary_control.section, empty_str);
+        assert_eq!(default.binary_control.priority, Priority::Optional);
+        assert_eq!(default.binary_control.pre_depends, empty_str);
+        assert_eq!(default.binary_control.architecture, Architecture::Any);
+    }
 }
