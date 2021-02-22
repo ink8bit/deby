@@ -117,8 +117,9 @@ impl Control {
         }
 
         let mut file = OpenOptions::new()
-            .create(true)
+            .read(true)
             .write(true)
+            .create(true)
             .open("debian/control")?;
 
         let contents = Control::create_contents(config, user_defined_fields);
