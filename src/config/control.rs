@@ -18,80 +18,10 @@ pub(crate) struct Control {
 
 impl Control {
     fn create_contents(config: &Config, user_defined_fields: Vec<&str>) -> String {
-        let mut additional = String::new();
-        for field in user_defined_fields {
-            additional.push_str(&format!("{}\n", field));
-        }
+        let additional = Control::format_additional_fields(user_defined_fields);
 
-        let mut source_data = String::new();
-        let mut binary_data = String::new();
-
-        let source = &config.control.source_control.source;
-        if !source.is_empty() {
-            let f = format!("Source: {}\n", source);
-            source_data.push_str(&f);
-        }
-
-        let section = &config.control.source_control.section;
-        if !section.is_empty() {
-            let f = format!("Section: {}\n", section);
-            source_data.push_str(&f);
-        }
-
-        let priority = &config.control.source_control.priority;
-        source_data.push_str(&format!("Priority: {}\n", priority));
-
-        let name = &config.control.source_control.maintainer.name;
-        let email = &config.control.source_control.maintainer.email;
-        source_data.push_str(&format!("Maintainer: {n} <{e}>\n", n = name, e = email));
-
-        let build_depends = &config.control.source_control.build_depends;
-        if !build_depends.is_empty() {
-            let f = format!("Build-Depends: {}\n", build_depends);
-            source_data.push_str(&f);
-        }
-
-        let standards_version = &config.control.source_control.standards_version;
-        if !standards_version.is_empty() {
-            let f = format!("Standards-Version: {}\n", standards_version);
-            source_data.push_str(&f);
-        }
-
-        let homepage = &config.control.source_control.homepage;
-        if !homepage.is_empty() {
-            let f = format!("Homepage: {}\n", homepage);
-            source_data.push_str(&f);
-        }
-
-        let vcs_browser = &config.control.source_control.vcs_browser;
-        if !vcs_browser.is_empty() {
-            let f = format!("Vcs-Browser: {}\n", vcs_browser);
-            source_data.push_str(&f);
-        }
-
-        let binary_package = &config.control.binary_control.package;
-        if !binary_package.is_empty() {
-            let f = format!("Package: {}\n", binary_package);
-            binary_data.push_str(&f);
-        }
-
-        let binary_section = &config.control.binary_control.section;
-        if !binary_section.is_empty() {
-            let f = format!("Section: {}\n", binary_section);
-            binary_data.push_str(&f);
-        }
-
-        let binary_priority = &config.control.binary_control.priority;
-        binary_data.push_str(&format!("Priority: {}\n", binary_priority));
-
-        let pre_depends = &config.control.binary_control.pre_depends;
-        binary_data.push_str(&format!("Pre-Depends: {}\n", pre_depends));
-
-        let arch = &config.control.binary_control.architecture;
-        binary_data.push_str(&format!("Architecture: {}\n", arch));
-
-        let description = &config.control.binary_control.description;
-        binary_data.push_str(&format!("Description: {}\n", description));
+        let source = Control::format_source_contents(&config);
+        let binary = Control::format_binary_contents(&config);
 
         let contents = format!(
             "
@@ -100,12 +30,133 @@ impl Control {
 {binary_data}
 {additional}
 ",
-            source_data = source_data.trim(),
-            binary_data = binary_data.trim(),
-            additional = additional.trim(),
+            source_data = source,
+            binary_data = binary,
+            additional = additional,
         );
 
         contents.trim().to_string()
+    }
+
+    fn format_str(key: &str, val: &str, acc: &mut String) {
+        if val.is_empty() {
+            return;
+        }
+        let f = format!("{k}: {v}\n", k = key, v = val);
+        acc.push_str(&f);
+    }
+
+    fn format_maintainer(name: &str, email: &str, acc: &mut String) {
+        let f = format!("Maintainer: {n} <{e}>\n", n = name, e = email);
+        acc.push_str(&f);
+    }
+
+    fn format_custom_data<T: Display>(key: &str, val: &T, acc: &mut String) {
+        let f = format!("{k}: {v}\n", k = key, v = val);
+        acc.push_str(&f);
+    }
+
+    fn format_binary_contents(config: &Config) -> String {
+        let mut binary_data = String::new();
+
+        Control::format_str(
+            "Package",
+            &config.control.binary_control.package,
+            &mut binary_data,
+        );
+
+        Control::format_str(
+            "Section",
+            &config.control.binary_control.section,
+            &mut binary_data,
+        );
+
+        Control::format_custom_data(
+            "Priority",
+            &config.control.binary_control.priority,
+            &mut binary_data,
+        );
+
+        Control::format_str(
+            "Pre-Depends",
+            &config.control.binary_control.pre_depends,
+            &mut binary_data,
+        );
+
+        Control::format_custom_data(
+            "Architecture",
+            &config.control.binary_control.architecture,
+            &mut binary_data,
+        );
+
+        Control::format_str(
+            "Description",
+            &config.control.binary_control.description,
+            &mut binary_data,
+        );
+
+        binary_data.trim().to_string()
+    }
+
+    fn format_source_contents(config: &Config) -> String {
+        let mut source_data = String::new();
+
+        let source = &config.control.source_control.source;
+        if !source.is_empty() {
+            let f = format!("Source: {}\n", source);
+            source_data.push_str(&f);
+        }
+
+        Control::format_str(
+            "Section",
+            &config.control.source_control.section,
+            &mut source_data,
+        );
+
+        Control::format_custom_data(
+            "Priority",
+            &config.control.source_control.priority,
+            &mut source_data,
+        );
+
+        let name = &config.control.source_control.maintainer.name;
+        let email = &config.control.source_control.maintainer.email;
+        Control::format_maintainer(name, email, &mut source_data);
+
+        Control::format_str(
+            "Build-Depends",
+            &config.control.source_control.build_depends,
+            &mut source_data,
+        );
+
+        Control::format_str(
+            "Standards-Version",
+            &config.control.source_control.standards_version,
+            &mut source_data,
+        );
+
+        Control::format_str(
+            "Homepage",
+            &config.control.source_control.homepage,
+            &mut source_data,
+        );
+
+        Control::format_str(
+            "Vcs-Browser",
+            &config.control.source_control.vcs_browser,
+            &mut source_data,
+        );
+
+        source_data.trim().to_string()
+    }
+
+    fn format_additional_fields(user_defined_fields: Vec<&str>) -> String {
+        let mut additional = String::new();
+        for field in user_defined_fields {
+            additional.push_str(&format!("{}\n", field));
+        }
+
+        additional.trim().to_string()
     }
 
     pub(crate) fn update<'a>(
@@ -275,5 +326,65 @@ mod tests {
         assert_eq!(default.binary_control.priority, Priority::Optional);
         assert_eq!(default.binary_control.pre_depends, empty_str);
         assert_eq!(default.binary_control.architecture, Architecture::Any);
+    }
+
+    #[test]
+    fn test_format_str() {
+        let fake_key = "fake key";
+        let fake_value = "fake value";
+        let mut acc = String::new();
+        let expected = format!("{k}: {v}\n", k = fake_key, v = fake_value);
+
+        Control::format_str(fake_key, fake_value, &mut acc);
+
+        assert_eq!(acc, expected);
+    }
+
+    #[test]
+    fn test_format_str_empty_string() {
+        let fake_key = "fake key";
+        let fake_value = "";
+        let mut acc = String::new();
+        let empty_str = String::new();
+
+        Control::format_str(fake_key, fake_value, &mut acc);
+
+        assert_eq!(acc, empty_str);
+    }
+
+    #[test]
+    fn test_format_maintainer() {
+        let fake_name = "fake key";
+        let fake_email = "fake email";
+        let mut acc = String::new();
+
+        Control::format_maintainer(fake_name, fake_email, &mut acc);
+        let expected = format!("Maintainer: {n} <{e}>\n", n = fake_name, e = fake_email);
+
+        assert_eq!(acc, expected);
+    }
+
+    #[test]
+    fn test_format_custom_data_priority() {
+        let fake_key = "fake key";
+        let fake_value = Priority::Optional;
+        let mut acc = String::new();
+        let expected = format!("{k}: {v}\n", k = fake_key, v = fake_value);
+
+        Control::format_custom_data(fake_key, &fake_value, &mut acc);
+
+        assert_eq!(acc, expected);
+    }
+
+    #[test]
+    fn test_format_custom_data_arch() {
+        let fake_key = "fake key";
+        let fake_value = Architecture::All;
+        let mut acc = String::new();
+        let expected = format!("{k}: {v}\n", k = fake_key, v = fake_value);
+
+        Control::format_custom_data(fake_key, &fake_value, &mut acc);
+
+        assert_eq!(acc, expected);
     }
 }
