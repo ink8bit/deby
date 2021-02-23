@@ -7,6 +7,19 @@ use std::io::Write;
 
 use super::{Config, Maintainer};
 
+const PACKAGE: &str = "Package";
+const PRIORITY: &str = "Priority";
+const HOME_PAGE: &str = "Homepage";
+const SECTION: &str = "Section";
+const MAINTAINER: &str = "Maintainer";
+const PRE_DEPENDS: &str = "Pre-Depends";
+const BUILD_DEPENDS: &str = "Build-Depends";
+const ARCH: &str = "Architecture";
+const DESC: &str = "Description";
+const SOURCE: &str = "Source";
+const STD_VER: &str = "Standards-Version";
+const VCS_BROWSER: &str = "Vcs-Browser";
+
 #[derive(Deserialize, Debug)]
 pub(crate) struct Control {
     update: bool,
@@ -47,7 +60,7 @@ impl Control {
     }
 
     fn format_maintainer(name: &str, email: &str, acc: &mut String) {
-        let f = format!("Maintainer: {n} <{e}>\n", n = name, e = email);
+        let f = format!("{m}: {n} <{e}>\n", m = MAINTAINER, n = name, e = email);
         acc.push_str(&f);
     }
 
@@ -60,37 +73,37 @@ impl Control {
         let mut binary_data = String::new();
 
         Control::format_str(
-            "Package",
+            PACKAGE,
             &config.control.binary_control.package,
             &mut binary_data,
         );
 
         Control::format_str(
-            "Section",
+            SECTION,
             &config.control.binary_control.section,
             &mut binary_data,
         );
 
         Control::format_custom_data(
-            "Priority",
+            PRIORITY,
             &config.control.binary_control.priority,
             &mut binary_data,
         );
 
         Control::format_str(
-            "Pre-Depends",
+            PRE_DEPENDS,
             &config.control.binary_control.pre_depends,
             &mut binary_data,
         );
 
         Control::format_custom_data(
-            "Architecture",
+            ARCH,
             &config.control.binary_control.architecture,
             &mut binary_data,
         );
 
         Control::format_str(
-            "Description",
+            DESC,
             &config.control.binary_control.description,
             &mut binary_data,
         );
@@ -101,20 +114,20 @@ impl Control {
     fn format_source_contents(config: &Config) -> String {
         let mut source_data = String::new();
 
-        let source = &config.control.source_control.source;
-        if !source.is_empty() {
-            let f = format!("Source: {}\n", source);
-            source_data.push_str(&f);
-        }
+        Control::format_str(
+            SOURCE,
+            &config.control.source_control.source,
+            &mut source_data,
+        );
 
         Control::format_str(
-            "Section",
+            SECTION,
             &config.control.source_control.section,
             &mut source_data,
         );
 
         Control::format_custom_data(
-            "Priority",
+            PRIORITY,
             &config.control.source_control.priority,
             &mut source_data,
         );
@@ -124,25 +137,25 @@ impl Control {
         Control::format_maintainer(name, email, &mut source_data);
 
         Control::format_str(
-            "Build-Depends",
+            BUILD_DEPENDS,
             &config.control.source_control.build_depends,
             &mut source_data,
         );
 
         Control::format_str(
-            "Standards-Version",
+            STD_VER,
             &config.control.source_control.standards_version,
             &mut source_data,
         );
 
         Control::format_str(
-            "Homepage",
+            HOME_PAGE,
             &config.control.source_control.homepage,
             &mut source_data,
         );
 
         Control::format_str(
-            "Vcs-Browser",
+            VCS_BROWSER,
             &config.control.source_control.vcs_browser,
             &mut source_data,
         );
