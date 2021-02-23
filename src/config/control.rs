@@ -387,4 +387,28 @@ mod tests {
 
         assert_eq!(acc, expected);
     }
+
+    #[test]
+    fn test_format_additional_fields() {
+        let fake_row_1 = "key1: value1";
+        let fake_row_2 = "key2: value2";
+        let fake_row_3 = "key3: value3";
+        let fake_fields: Vec<&str> = vec![fake_row_1, fake_row_2, fake_row_3];
+        let expected = format!(
+            "
+{row_1}
+{row_2}
+{row_3}
+",
+            row_1 = fake_row_1,
+            row_2 = fake_row_2,
+            row_3 = fake_row_3,
+        )
+        .trim()
+        .to_string();
+
+        let actual = Control::format_additional_fields(fake_fields);
+
+        assert_eq!(actual, expected);
+    }
 }
