@@ -42,7 +42,7 @@ impl Changelog {
             "
 {package} ({version}) {distribution}; urgency={urgency}
 
-{changes}
+  {changes}
 
 -- {name} <{email}>  {date}",
             package = config.changelog.package,
@@ -64,7 +64,7 @@ impl Changelog {
         }
         let mut formatted_changes = String::new();
         for line in changes.lines() {
-            formatted_changes.push_str(&format!("* {}\n", line));
+            formatted_changes.push_str(&format!("  * {}\n", line));
         }
 
         formatted_changes.trim().to_string()
@@ -229,9 +229,9 @@ mod tests {
         let fake_changes = "change1\nchange2\nchange3\n";
 
         let actual = Changelog::format_changes(fake_changes);
-        let expected = "* change1
-* change2
-* change3
+        let expected = "  * change1
+  * change2
+  * change3
 "
         .trim()
         .to_string();
