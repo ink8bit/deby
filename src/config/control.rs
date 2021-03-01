@@ -177,7 +177,7 @@ impl Control {
         user_defined_fields: Vec<&str>,
     ) -> Result<&'a str, Box<dyn Error>> {
         if !config.control.update {
-            return Ok("debian/control file not updated due to config file setting.");
+            return Ok("debian/control file not updated due to config file setting");
         }
 
         let mut file = OpenOptions::new()
@@ -190,7 +190,7 @@ impl Control {
 
         file.write_all(contents.as_bytes())?;
 
-        Ok("Successfully created a new entry in debian/control file.")
+        Ok("Successfully created a new entry in debian/control file")
     }
 
     pub(crate) fn default() -> Self {
