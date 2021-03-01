@@ -80,7 +80,7 @@ impl Changelog {
         changes: &str,
     ) -> Result<&'a str, Box<dyn Error>> {
         if !config.changelog.update {
-            return Ok("debian/changelog file not updated due to config file setting.");
+            return Ok("debian/changelog file not updated due to config file setting");
         }
 
         let mut file = OpenOptions::new()
@@ -97,7 +97,7 @@ impl Changelog {
 
         file.write_all(contents.as_bytes())?;
 
-        Ok("Successfully created a new entry in debian/changelog file.")
+        Ok("Successfully created a new entry in debian/changelog file")
     }
 
     pub(crate) fn default() -> Self {
