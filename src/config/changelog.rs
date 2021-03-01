@@ -71,7 +71,8 @@ impl Changelog {
     }
 
     fn format_date() -> String {
-        Utc::now().to_rfc2822()
+        let dt = Local::now();
+        dt.to_rfc2822()
     }
 
     pub(crate) fn update<'a>(
