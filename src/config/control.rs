@@ -182,6 +182,7 @@ impl Control {
 
         let mut file = OpenOptions::new()
             .read(true)
+            .truncate(true)
             .write(true)
             .create(true)
             .open("debian/control")?;
