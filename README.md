@@ -203,6 +203,30 @@ Read more about possible values for certain fields below.
 - `optional`
 - `extra`
 
+### Depends
+
+#### `Build-Depends` field
+
+You can completely omit this field if you don't need to use it.
+You can use only one value in `.debyrc`:
+
+```json
+{
+  "buildDepends": ["value 1"]
+}
+```
+
+or multiple values:
+
+```json
+{
+  "buildDepends": [
+    "depends 1",
+    "depends 2"
+  ]
+}
+```
+
 ## Official docs
 
 You can read more information about all fields on official website:
