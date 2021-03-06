@@ -59,6 +59,22 @@ impl Control {
         acc.push_str(&f);
     }
 
+    fn format_vec(key: &str, values: &[String], acc: &mut String) {
+        if values.is_empty() {
+            return;
+        }
+        if values.len() == 1 {
+            let f = format!("{k}: {v}\n", k = key, v = values[0]);
+            acc.push_str(&f);
+            return;
+        }
+        let mut f = format!("{}:", key);
+        for v in values {
+            f.push_str(&format!("\n {}", v));
+        }
+        acc.push_str(&format!("{}\n", f));
+    }
+
     fn format_maintainer(name: &str, email: &str, acc: &mut String) {
         let f = format!("{m}: {n} <{e}>\n", m = MAINTAINER, n = name, e = email);
         acc.push_str(&f);
@@ -136,7 +152,7 @@ impl Control {
         let email = &config.control.source_control.maintainer.email;
         Control::format_maintainer(name, email, &mut source_data);
 
-        Control::format_str(
+        Control::format_vec(
             BUILD_DEPENDS,
             &config.control.source_control.build_depends,
             &mut source_data,
@@ -205,7 +221,7 @@ impl Control {
                 },
                 section: "".to_string(),
                 priority: Priority::Optional,
-                build_depends: "".to_string(),
+                build_depends: vec![],
                 standards_version: "".to_string(),
                 homepage: "".to_string(),
                 vcs_browser: "".to_string(),
@@ -223,6 +239,10 @@ impl Control {
 
     fn default_string_value() -> String {
         "".to_string()
+    }
+
+    fn default_vec_value() -> Vec<String> {
+        vec![]
     }
 }
 
@@ -296,9 +316,9 @@ struct SourceControl {
     priority: Priority,
     #[serde(
         rename(deserialize = "buildDepends"),
-        default = "Control::default_string_value"
+        default = "Control::default_vec_value"
     )]
-    build_depends: String,
+    build_depends: Vec<String>,
     #[serde(
         rename(deserialize = "standardsVersion"),
         default = "Control::default_string_value"
@@ -321,6 +341,7 @@ mod tests {
     fn test_default() {
         let default = Control::default();
         let empty_str = String::new();
+        let empty_vec: Vec<String> = vec![];
 
         assert_eq!(default.update, false);
 
@@ -329,7 +350,7 @@ mod tests {
         assert_eq!(default.source_control.maintainer.email, empty_str);
         assert_eq!(default.source_control.section, empty_str);
         assert_eq!(default.source_control.priority, Priority::Optional);
-        assert_eq!(default.source_control.build_depends, empty_str);
+        assert_eq!(default.source_control.build_depends, empty_vec);
         assert_eq!(default.source_control.standards_version, empty_str);
         assert_eq!(default.source_control.homepage, empty_str);
         assert_eq!(default.source_control.vcs_browser, empty_str);
@@ -424,5 +445,55 @@ mod tests {
         let actual = Control::format_additional_fields(fake_fields);
 
         assert_eq!(actual, expected);
+    }
+
+    #[test]
+    fn test_format_vec_empty() {
+        let fake_key = "KEY";
+        let fake_values: Vec<String> = vec![];
+        let mut acc = String::new();
+        let expected = "";
+
+        Control::format_vec(fake_key, &fake_values, &mut acc);
+
+        assert_eq!(acc, expected);
+    }
+
+    #[test]
+    fn test_format_vec_one_item() {
+        let fake_key = "KEY";
+        let fake_values: Vec<String> = vec!["value 1".to_string()];
+        let mut acc = String::new();
+        let expected = format!("{k}: {v}\n", k = fake_key, v = fake_values[0]);
+
+        Control::format_vec(fake_key, &fake_values, &mut acc);
+
+        assert_eq!(acc, expected);
+    }
+
+    #[test]
+    fn test_format_vec_multiple_items() {
+        let fake_key = "KEY";
+        let fake_values: Vec<String> = vec![
+            "value 1".to_string(),
+            "value 2".to_string(),
+            "value 3".to_string(),
+        ];
+        let mut acc = String::new();
+        let expected = format!(
+            "{k}:
+ {v1}
+ {v2}
+ {v3}
+",
+            k = fake_key,
+            v1 = fake_values[0],
+            v2 = fake_values[1],
+            v3 = fake_values[2]
+        );
+
+        Control::format_vec(fake_key, &fake_values, &mut acc);
+
+        assert_eq!(acc, expected);
     }
 }
