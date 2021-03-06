@@ -70,9 +70,10 @@ impl Control {
         }
         let mut f = format!("{}:", key);
         for v in values {
-            f.push_str(&format!("\n {}", v));
+            f.push_str(&format!("\n {},", v));
         }
-        acc.push_str(&format!("{}\n", f));
+        let stripped = f.strip_suffix(',').unwrap_or_default();
+        acc.push_str(&format!("{}\n", stripped));
     }
 
     fn format_maintainer(name: &str, email: &str, acc: &mut String) {
@@ -482,8 +483,8 @@ mod tests {
         let mut acc = String::new();
         let expected = format!(
             "{k}:
- {v1}
- {v2}
+ {v1},
+ {v2},
  {v3}
 ",
             k = fake_key,
