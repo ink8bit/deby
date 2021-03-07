@@ -18,6 +18,15 @@ The crate is only available via git repo for now. You can include `git` key with
 deby = { git = "https://github.com/ink8bit/deby", branch = "main" }
 ```
 
+## Public API
+
+- [update](#update) - updates *debian control* and *changelog* files
+- [update_changelog_file](#update_changelog_file) - updates only *debian changelog* file
+- [update_control_file](#update_control_file) - updates only *debian control* file
+
+
+### `update`
+
 ```rust
 // provide required arguments
 let version = "1.0.0";
@@ -35,17 +44,22 @@ match deby::update(version, changes, user_defined_fields) {
 }
 ```
 
-If you want to update *control* and *changelog* files separately, you should use two public functions:
+### `update_changelog_file`
 
 ```rust
 let version = "1.0.0";
 let changes = "changes:\nline1\nline2\nline3";
-let user_defined_fields: Vec<&str> = vec!["Some-Field: A", "Another-Field: B"];
 
 match deby::update_changelog_file(version, changes) {
     Ok(msg) => println!("{}", msg),
     Err(e) => panic!("{}", e),
 }
+```
+
+### `update_control_file`
+
+```rust
+let user_defined_fields: Vec<&str> = vec!["Some-Field: A", "Another-Field: B"];
 
 match deby::update_control_file(user_defined_fields) {
     Ok(msg) => println!("{}", msg),
@@ -57,7 +71,7 @@ match deby::update_control_file(user_defined_fields) {
 
 A configuration file `.debyrc` should be placed in the project root.
 
-It should be a valid JSON file and contain the following fields:
+It should be a valid *JSON* file and contain the following fields:
 
 ```json
 {
@@ -98,7 +112,7 @@ It should be a valid JSON file and contain the following fields:
 }
 ```
 
-If you don't want to create `control` or `changelog` file you have to use `update: false` in the corresponding sections of your `.debyrc`:
+If you don't want to create `control` or `changelog` files you need to use `update: false` in the corresponding sections of your `.debyrc`:
 
 ```json
 {
