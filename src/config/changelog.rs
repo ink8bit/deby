@@ -21,6 +21,13 @@ pub(crate) struct Changelog {
 }
 
 impl Changelog {
+    /// Formats contents of _changelog_ file.
+    /// Newer entries will go first
+    ///
+    /// # Arguments
+    ///
+    /// - `entry`- a single _changelog_ entry to be added to _changelog_ file
+    /// - `current_file_contents` - previous entries of _changelog_ file
     fn format_contents(entry: &str, current_file_contents: &str) -> String {
         let contents = format!(
             "
@@ -35,6 +42,13 @@ impl Changelog {
         contents.trim().to_string()
     }
 
+    /// Formats a single changelog entry
+    ///
+    /// # Arguments
+    ///
+    /// - `config` - data from config file `.debyrc`
+    /// - `version` - version string value to be included in _changelog_ entry
+    /// - `changes` - changes string value to be included in _changelog_ entry
     fn format_changelog_entry(config: &Config, version: &str, changes: &str) -> String {
         let date = Changelog::format_date();
 
@@ -58,6 +72,11 @@ impl Changelog {
         contents
     }
 
+    /// Formats changes section
+    ///
+    /// # Arguments
+    ///
+    /// - `changes` - string value of changes
     fn format_changes(changes: &str) -> String {
         if changes.is_empty() {
             return "".to_string();
@@ -70,11 +89,19 @@ impl Changelog {
         formatted_changes.trim().to_string()
     }
 
+    /// Formats current date value according to RFC 2822
     fn format_date() -> String {
         let dt = Local::now();
         dt.to_rfc2822()
     }
 
+    /// Updates _changelog_ file and writes its contents to `debian/changelog` file
+    ///
+    /// # Arguments
+    ///
+    /// - `config` - data from config file `.debyrc`
+    /// - `version` - version string to be included in _changelog_ file
+    /// - `changes` - changes string value to be included in _changelog_ file
     pub(crate) fn update<'a>(
         config: &Config,
         version: &str,
