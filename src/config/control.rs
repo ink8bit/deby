@@ -30,6 +30,12 @@ pub(crate) struct Control {
 }
 
 impl Control {
+    /// Formats _control_ file contents
+    ///
+    /// # Arguments
+    ///
+    /// - `config` - data from config file `.debyrc`
+    /// - `user_defined_fields` - dynamic field values provided by a user
     fn create_contents(config: &Config, user_defined_fields: Vec<&str>) -> String {
         let additional = Control::format_additional_fields(user_defined_fields);
 
@@ -51,6 +57,13 @@ impl Control {
         contents.trim().to_string()
     }
 
+    /// Formats _string_ value
+    ///
+    /// # Arguments
+    ///
+    /// - `key` - control field key
+    /// - `val` - string value to be formatted
+    /// - `acc` - accumulator string to be used in final output
     fn format_str(key: &str, val: &str, acc: &mut String) {
         if val.is_empty() {
             return;
@@ -59,6 +72,13 @@ impl Control {
         acc.push_str(&f);
     }
 
+    /// Formats _vector_ value
+    ///
+    /// # Arguments
+    ///
+    /// - `key` - control field key
+    /// - `values` - multiple items to format
+    /// - `acc` - accumulator string to be used in final output
     fn format_vec(key: &str, values: &[String], acc: &mut String) {
         if values.is_empty() {
             return;
@@ -76,6 +96,13 @@ impl Control {
         acc.push_str(&format!("{}\n", stripped));
     }
 
+    /// Formats `maintainer` string value
+    ///
+    /// # Arguments
+    ///
+    /// - `name` - maintainer full name
+    /// - `email` - maintainer email
+    /// - `acc` - accumulator string to be used in final output
     fn format_maintainer(name: &str, email: &str, acc: &mut String) {
         let f = format!("{m}: {n} <{e}>\n", m = MAINTAINER, n = name, e = email);
         acc.push_str(&f);
@@ -86,6 +113,11 @@ impl Control {
         acc.push_str(&f);
     }
 
+    /// Formats _binary section_ of _control_ file
+    ///
+    /// # Arguments
+    ///
+    /// - `config` - data from config file `.debyrc`
     fn format_binary_contents(config: &Config) -> String {
         let mut binary_data = String::new();
 
@@ -128,6 +160,11 @@ impl Control {
         binary_data.trim().to_string()
     }
 
+    /// Formats _source section_ of _control_ file
+    ///
+    /// # Arguments
+    ///
+    /// - `config` - data from config file `.debyrc`
     fn format_source_contents(config: &Config) -> String {
         let mut source_data = String::new();
 
@@ -180,6 +217,11 @@ impl Control {
         source_data.trim().to_string()
     }
 
+    /// Formats additional values to be used in _control_ file
+    ///
+    /// # Arguments
+    ///
+    /// - `user_defined_fields` - dynamic fields defined by a user
     fn format_additional_fields(user_defined_fields: Vec<&str>) -> String {
         let mut additional = String::new();
         for field in user_defined_fields {
@@ -189,6 +231,12 @@ impl Control {
         additional.trim().to_string()
     }
 
+    /// Updates _control_ file and writes its contents to `debian/control` file
+    ///
+    /// # Arguments
+    ///
+    /// - `config` - data from config file `.debyrc`
+    /// - `user_defined_fields` - dynamic field values provided by a user
     pub(crate) fn update<'a>(
         config: &Config,
         user_defined_fields: Vec<&str>,
