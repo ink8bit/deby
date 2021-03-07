@@ -77,7 +77,7 @@ It should be a valid JSON file and contain the following fields:
       "source": "source",
       "section": "section",
       "priority": "optional",
-      "buildDepends": "depends",
+      "buildDepends": ["depends"],
       "standardsVersion": "1.2.3",
       "homepage": "url",
       "vcsBrowser": "url",
@@ -118,7 +118,7 @@ If you don't want to create `control` or `changelog` file you have to use `updat
       "source": "source",
       "section": "section",
       "priority": "optional",
-      "buildDepends": "depends",
+      "buildDepends": ["depends"],
       "standardsVersion": "1.2.3",
       "homepage": "url",
       "vcsBrowser": "url"
