@@ -220,36 +220,31 @@ mod tests {
         let actual = Changelog::format_contents(fake_entry, fake_current_file);
 
         let expected = format!(
-            "
-{entry}
+            "{entry}
 
 {current}
 ",
             entry = fake_entry,
             current = fake_current_file
-        )
-        .trim()
-        .to_string();
+        );
 
         assert_eq!(actual, expected);
     }
 
     #[test]
     fn test_format_contents_whitespace_new_line() {
-        let fake_entry = "\nentry     \n\n";
-        let fake_current_file = "\ncurrent file contents     \n";
+        let fake_entry = "entry     \n\n";
+        let fake_current_file = "current file contents";
         let actual = Changelog::format_contents(fake_entry, fake_current_file);
 
         let expected = format!(
-            "
-{entry}
+            "{entry}
 
-{current}",
+{current}
+",
             entry = fake_entry,
             current = fake_current_file
-        )
-        .trim()
-        .to_string();
+        );
 
         assert_eq!(actual, expected);
     }
