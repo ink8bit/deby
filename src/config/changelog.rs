@@ -58,7 +58,7 @@ impl Changelog {
 
   {changes}
 
--- {name} <{email}>  {date}",
+ -- {name} <{email}>  {date}",
             package = config.changelog.package,
             email = config.changelog.maintainer.email,
             name = config.changelog.maintainer.name,
