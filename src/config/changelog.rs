@@ -39,7 +39,9 @@ impl Changelog {
             current = current_file_contents
         );
 
-        contents.trim().to_string()
+        let mut s = contents.trim().to_string();
+        s.push('\n');
+        s
     }
 
     /// Formats a single changelog entry
