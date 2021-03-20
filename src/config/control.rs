@@ -54,7 +54,9 @@ impl Control {
             additional = additional,
         );
 
-        contents.trim().to_string()
+        let mut s = contents.trim().to_string();
+        s.push('\n');
+        s
     }
 
     /// Formats _string_ value
