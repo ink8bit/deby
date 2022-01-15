@@ -2,7 +2,7 @@
 name = "deby"
 version = "0.0.7"
 authors = ["ink8bit <ink8bit@users.noreply.github.com>"]
-edition = "2018"
+edition = "2021"
 
 publish = false
 
