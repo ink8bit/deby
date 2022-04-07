@@ -117,15 +117,15 @@ If you don't want to create `control` or `changelog` files you need to use `upda
 
 ```json
 {
-  "package": "package name",
-  "maintainer": {
-    "email": "user@example.com",
-    "name": "username"
-  },
   "changelog": {
     "update": false,
+    "package": "changelog package name",
     "distribution": "unstable",
-    "urgency": "low"
+    "urgency": "low",
+    "maintainer": {
+      "name": "maintainer name",
+      "email": "maintainer email"
+    }
   },
   "control": {
     "update": false,
@@ -133,12 +133,19 @@ If you don't want to create `control` or `changelog` files you need to use `upda
       "source": "source",
       "section": "section",
       "priority": "optional",
-      "buildDepends": ["depends"],
+      "buildDepends": [
+        "depends"
+      ],
       "standardsVersion": "1.2.3",
       "homepage": "url",
-      "vcsBrowser": "url"
+      "vcsBrowser": "url",
+      "maintainer": {
+        "name": "maintainer name",
+        "email": "maintainer email"
+      }
     },
     "binaryControl": {
+      "package": "binary package name",
       "description": "description",
       "section": "section",
       "priority": "optional",
@@ -149,29 +156,17 @@ If you don't want to create `control` or `changelog` files you need to use `upda
 }
 ```
 
-You can omit `changelog` or `control` (or both) sections entirely:
-
-```json
-{
-  "package": "package name",
-  "maintainer": {
-    "email": "user@example.com",
-    "name": "username"
-  }
-}
-```
-
 You can omit certain fields, in this case default values will be used. For example:
 
 ```json
 {
-  "package": "package name",
-  "maintainer": {
-    "email": "user@example.com",
-    "name": "username"
-  },
   "changelog": {
-    "update": true
+    "update": true,
+    "package": "package name",
+    "maintainer": {
+      "email": "user@example.com",
+      "name": "username"
+    }
   }
 }
 ```
