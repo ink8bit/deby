@@ -20,12 +20,9 @@ deby = { git = "https://github.com/ink8bit/deby", branch = "main" }
 
 ## Public API
 
-- [update](#update) - updates *debian control* and *changelog* files
-- [update_changelog_file](#update_changelog_file) - updates only *debian changelog* file
-- [update_control_file](#update_control_file) - updates only *debian control* file
-
-
 ### `update`
+
+Update *debian control* and *changelog* files.
 
 ```rust
 // provide required arguments
@@ -46,6 +43,8 @@ match deby::update(version, changes, user_defined_fields) {
 
 ### `update_changelog_file`
 
+Update only *debian changelog* file.
+
 ```rust
 let version = "1.0.0";
 let changes = "changes:\nline1\nline2\nline3";
@@ -57,6 +56,8 @@ match deby::update_changelog_file(version, changes) {
 ```
 
 ### `update_control_file`
+
+Update only *debian control* file.
 
 ```rust
 let user_defined_fields: Vec<&str> = vec!["Some-Field: A", "Another-Field: B"];
