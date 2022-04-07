@@ -29,7 +29,6 @@ Update *debian control* and *changelog* files.
 let version = "1.0.0";
 let changes = "some changes";
 
-// if you want to provide additional fields - separate them with `;` or just put an empty string
 let user_defined_fields: Vec<&str> = vec!["Some-Field: A", "Another-Field: B"];
 
 match deby::update(version, changes, user_defined_fields) {
